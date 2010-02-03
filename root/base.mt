@@ -2,12 +2,39 @@
 <head>
     <title><? block title => 'mgrgw.jp' ?></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" href="http://soffritto.org/css/style.css">
     <style type="text/css">
+        * {
+            font-family: "Lucida Grande", Verdana, Arial, Geneva, sans-serif;
+            line-height: 2em;
+            font-weight: normal;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            margin: 30px;
+            padding: 30px;
+            border: 2px solid #FCC800;
+        }
+        a {
+            text-decoration: none;
+            color: #FCC800;
+            padding: 2px;
+        }
+        a:hover {
+            border-bottom: 2px solid #fcc800;
+        }
+        dl, ul, p, dd {
+            margin: 0px 30px;
+        }
         h1 {
             color: #fcc800;
             font-size: 100%;
             float: left;
+        }
+        h1 a {
+            background: none;
+            height: 1em;
+            text-indent: 0px;
         }
         div.status {
             margin-top: 5px;
@@ -42,7 +69,7 @@
 <body>
 <div id="header">
 ? block header => sub {
-    <h1><? block 'title' ?></h1>
+    <h1><a href="<?= $c->uri_for('/') ?>"><? block 'title' ?></a></h1>
 <ul class="menu">
 ? if (my $user = $c->user) {
     <li>hello, <?= $user->obj ? $user->obj->username : 'new user' ?>!</li>

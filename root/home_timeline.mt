@@ -6,7 +6,7 @@
 <script type="text/javascript">
 function insert_status (data) {
     var when = $('<span/>').addClass('timestamp')
-        .attr('title', (new Date(data.created_at)).toUTCString())
+        .attr('title', (new Date(data.created_at)).toString())
         .text(data.created_at);
     var text = $('<span/>').addClass('content').text(data.text);
     var username = $('<span/>').addClass('username').text(data.user.screen_name);
