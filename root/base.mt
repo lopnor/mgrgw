@@ -1,10 +1,14 @@
 <html>
 <head>
-    <title><? block title => 'something like twitter' ?></title>
+    <title><? block title => 'mgrgw.jp' ?></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="http://soffritto.org/css/style.css">
     <style type="text/css">
-        
+        h1 {
+            color: #fcc800;
+            font-size: 100%;
+            float: left;
+        }
         div.status {
             margin-top: 5px;
             padding: 5px;
@@ -19,8 +23,9 @@
             margin: 5px;
         }
         ul.menu {
+            text-align: right;
             margin: 0px; 
-            padding: 5px;
+            padding: 0px;
         }
         ul.menu li{
             margin: 0px;
@@ -32,6 +37,7 @@
 <body>
 <div id="header">
 ? block header => sub {
+    <h1><? block 'title' ?></h1>
 <ul class="menu">
 ? if (my $user = $c->user) {
     <li>hello, <?= $user->obj ? $user->obj->username : 'new user' ?>!</li>

@@ -19,9 +19,9 @@
 ? }
 </ul>
 ? }
+        </td>
     </tr>
 ? }
-        </td>
 <tr>
     <td></td>
     <td colspan="2"><input type="submit" value="<?= $submit ?>"></td>
