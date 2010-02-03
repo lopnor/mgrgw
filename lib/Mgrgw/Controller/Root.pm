@@ -74,8 +74,10 @@ sub setup :Local :Form('Mgrgw::Form::Setup') {
 sub settings :Local :Form('Mgrgw::Form::Settings') :LoginUser {
     my ($self, $c) = @_;
 
+    my $u = $c->user->obj;
     if ($c->req->method eq 'POST' and $self->form->submitted_and_valid) {
-
+        $u->update($self->form->params);
+        return $c->redirect($c->uri_for('/'));
     }
     $self->form->fill({fullname => $c->user->obj->fullname});
 }
