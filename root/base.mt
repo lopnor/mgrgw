@@ -30,6 +30,12 @@
             margin: 0px;
             display: inline;
         }
+        form {
+            margin: 10px;
+        }
+        input {
+            margin-right: 5px;
+        }
     </style>
 ? block js => '';
 </head>
