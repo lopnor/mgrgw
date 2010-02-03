@@ -1,41 +1,47 @@
 ? extends 'base';
 
-? block content => sub {
-<form id="update_status" action="#">
-<input type="text" size="50" name="status" />
-<input type="submit" value="update" />
-</form>
-<div id="statuses">
-<div id="append_here"></div>
-</div>
+? block js => sub {
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+<script src="<?= $c->uri_for('/js/pretty.js') ?>"></script>
 <script type="text/javascript">
 function insert_status (data) {
-    var date = new Date(data.created_at);
-    $('<div/>')
-        .addClass('status')
-        .html(data.user.screen_name + ':' + data.text + '(' + date.toDateString() + ')' )
-        .insertAfter($('#append_here'));
+    var when = $('<span/>').addClass('timestamp')
+        .attr('title', (new Date(data.created_at)).toUTCString())
+        .text(data.created_at);
+    var text = $('<span/>').addClass('content').text(data.text);
+    var username = $('<span/>').addClass('username').text(data.user.screen_name);
+    var div = $('<div/>').addClass('status').append(username).append(text).append(when);
+    $('#statuses').prepend(div);
+    $('.timestamp').prettyDate();
 }
 $(function() {
-    $(':input[name=status]').attr('autocomplete', 'off');
+    $(':input[name=status]').attr('autocomplete', 'off').focus();
     $.getJSON(
         "<?= $c->uri_for('/statuses/home_timeline.json') ?>",
         function (statuses) {
             $.each(statuses.reverse(), function(i, e) {insert_status(e)});
         }
     );
-});
-$('#update_status').submit(function() {
-    $.post(
-        "<?= $c->uri_for('/statuses/update.json') ?>",
-        $(this).serialize(),
-        function (data) {
-            insert_status(data);
-            $('#update_status :input[name=status]').val('');
-        },
-        "json"
-    );
-    return false;
+    $('#update_status').submit(function() {
+        $.post(
+            "<?= $c->uri_for('/statuses/update.json') ?>",
+            $(this).serialize(),
+            function (data) {
+                insert_status(data);
+                $('#update_status :input[name=status]').val('').focus();
+            },
+            "json"
+        );
+        return false;
+    });
 });
 </script>
+? };
+
+? block content => sub {
+<form id="update_status" action="#">
+<input type="text" size="50" name="status" />
+<input type="submit" value="update" />
+</form>
+<div id="statuses"></div>
 ? };
