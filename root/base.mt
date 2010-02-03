@@ -11,16 +11,15 @@
         }
         div.status {
             margin-top: 5px;
-            padding: 5px;
         }
         .username {
             color: #fcc800;
-            margin: 5px;
+            margin-right: 5px;
         }
         .timestamp {
             color: #cccccc;
             font-size: 80%;
-            margin: 5px;
+            margin-left: 5px;
         }
         ul.menu {
             text-align: right;
