@@ -13,7 +13,7 @@ sub request_token :Local {
     $c->res->body($token);
 }
 
-sub authorize :Local :BasicAuth :Form('Mgrgw::Form::Authorize') {
+sub authorize :Local :LoginUser :Form('Mgrgw::Form::Authorize') {
     my ($self, $c) = @_;
     my $token = models('Schema::Token')->token_to_authorize($c->req)
         or $c->detach('default');
@@ -28,7 +28,7 @@ sub authorized :Private {
     my $cb = models('Schema::Token')->authorize_token(
         {
             token => $token,
-            user  => $c->stash->{user},
+            user  => $c->user->obj,
         }
     );
     if ($cb) {

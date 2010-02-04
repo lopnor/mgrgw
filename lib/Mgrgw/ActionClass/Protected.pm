@@ -18,7 +18,8 @@ around ACTION => sub {
             if (($auth || '') =~ /^Basic (.*)$/) {
                 $user = models('Schema::User')->basic_auth($auth);
             } else {
-                my $token = models('Schema::Token')->protected_resource_request($c->req);
+                my $token = models('Schema::Token')->protected_resource_request($c->req)
+                    or last;
                 $user = $token->user;
                 $c->stash->{application} = $token->application;
             }
