@@ -150,8 +150,9 @@ sub protected_resource_request {
     )->single or return;
     my $app = $token->application;
     $app->consumer_key eq $req->param('oauth_consumer_key') or return;
-    my $oauth = Net::OAuth->request('protected resource')->from_post_body(
-        $req->raw_body,
+    my $params = $req->body_parameters;
+    my $oauth = Net::OAuth->request('protected resource')->from_hash(
+        $req->params,
         request_method => $req->method,
         request_url => $uri,
         token_secret => $token->secret,

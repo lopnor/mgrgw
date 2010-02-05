@@ -60,8 +60,16 @@
         form {
             margin: 10px;
         }
+        form table {
+            width: 100%;
+        }
         input {
-            margin-right: 5px;
+            padding-right: 5px;
+        }
+        th {
+            color: #fcc800;
+            text-align: right;
+            padding-right: 5px;
         }
     </style>
 ? block js => '';

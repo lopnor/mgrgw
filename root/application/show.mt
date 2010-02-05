@@ -1,10 +1,12 @@
 ? extends 'base';
 
 ? block content => sub {
-<dl>
+<table class="view">
 ? for my $attr (qw(name callback_url consumer_key consumer_secret)) {
-<dt><?= $attr ?></dt>
-<dd><?= $s->{app}->$attr ?></dd>
+<tr>
+<th><?= $attr ?></th>
+<td><?= $s->{app}->$attr || 'undefined' ?></td>
+</tr>
 ? }
-</dl>
+</table>
 ? };

@@ -6,6 +6,9 @@
 ? }
 <table>
 ? for my $field (keys %{$form->fields}) {
+?   if ($form->fields->{$field}->{type} eq 'hidden') {
+        <?= raw_string $form->input($field) ?>
+?   } else {
     <tr>
         <th><?= raw_string $form->label($field) ?></th>
         <td>
@@ -21,6 +24,7 @@
 ? }
         </td>
     </tr>
+? }
 ? }
 <tr>
     <td></td>

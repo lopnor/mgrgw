@@ -1,5 +1,4 @@
-<form method="post" action="?">
-<?= $s->{form}->render ?>
-<input type="submit" value="verify this app" />
-</form>
-
+? extends 'base';
+? block content => sub {
+<?= include('form', $s->{form}, 'verify this app', '?') ?>
+? };
