@@ -43,7 +43,7 @@
             color: #fcc800;
             margin-right: 5px;
         }
-        .timestamp {
+        #appearance, .timestamp {
             color: #cccccc;
             font-size: 80%;
             margin-left: 5px;

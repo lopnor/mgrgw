@@ -2,6 +2,7 @@ package Mgrgw::ActionClass::Protected;
 use Any::Moose '::Role';
 use MIME::Base64 ();
 use Mgrgw::Models;
+use DateTime;
 
 around ACTION => sub {
     my ($next, $self, $action, @args) = @_;
@@ -27,6 +28,7 @@ around ACTION => sub {
         if ($user) {
             $c->req->env->{REMOTE_USER} = $user->username;
             $c->stash->{user} = $user;
+            models('Schema::Appearance')->record($user,$c->req);
         } else {
             $c->res->status(401);
             $c->res->header('WWW-Authenticate' => "Basic realm=\"$realm\"");

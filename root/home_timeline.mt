@@ -5,6 +5,8 @@
 <script src="<?= $c->uri_for('/js/jquery.oembed.js') ?>"></script>
 <script src="<?= $c->uri_for('/js/pretty.js') ?>"></script>
 <script type="text/javascript">
+
+var latest_id = 0;
 function insert_status (data) {
     var when = $('<span/>').addClass('timestamp')
         .attr('title', (new Date(data.created_at)).toString())
@@ -20,14 +22,30 @@ function insert_status (data) {
     $('#statuses').prepend(div);
     $('.timestamp').prettyDate();
 }
-$(function() {
-    $(':input[name=status]').attr('autocomplete', 'off').focus();
+function appearance () {
     $.getJSON(
-        "<?= $c->uri_for('/statuses/home_timeline.json') ?>",
-        function (statuses) {
-            $.each(statuses.reverse(), function(i, e) {insert_status(e)});
+        "<?= $c->uri_for('/appearance/current.json') ?>",
+        function (data) {
+            since = $('<span/>')
+                .attr('title', (new Date(data.created_at)).toString())
+                .prettyDate();
+            $('#appearance').text("you're here since ").append(since);
         }
     );
+    $.getJSON(
+        "<?= $c->uri_for('/statuses/home_timeline.json') ?>",
+        { since_id: latest_id },
+        function (statuses) {
+            latest_id = statuses[0].id;
+            $.each(statuses.reverse(), function(i, e) {
+                insert_status(e);
+            });
+        }
+    );
+}
+$(function() {
+    appearance();
+    $(':input[name=status]').attr('autocomplete', 'off').focus();
     $('#update_status').submit(function() {
         $.post(
             "<?= $c->uri_for('/statuses/update.json') ?>",
@@ -40,6 +58,7 @@ $(function() {
         );
         return false;
     });
+    window.setInterval(function(){appearance()}, 1000 * 60 * 5);
 });
 </script>
 ? };
@@ -48,6 +67,7 @@ $(function() {
 <form id="update_status" action="#">
 <input type="text" size="50" name="status" />
 <input type="submit" value="update" />
+<span id="appearance"></span>
 </form>
 <div id="statuses"></div>
 ? };

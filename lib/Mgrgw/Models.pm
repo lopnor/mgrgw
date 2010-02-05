@@ -11,7 +11,7 @@ register Schema => sub {
     Mgrgw::Schema->connect(@$conf);
 };
 
-for my $table (qw(User Status Application Token OpenID)) {
+for my $table (qw(User Status Application Token OpenID Appearance)) {
     register "Schema::$table" => sub {
         my $self = shift;
         $self->get('Schema')->resultset($table);
