@@ -52,18 +52,20 @@ function appearance () {
     );
 }
 function setup_timeline() {
+    var offset = (new Date()).getTimezoneOffset() / 60 * -1;
     var es = new Timeline.DefaultEventSource();
     var bi = [
         Timeline.createBandInfo({
             eventSource: es,
-            date: (new Date()).toString(),
+            timeZone: offset,
             width: '70%',
             intervalUnit: Timeline.DateTime.HOUR,
             intervalPixels: 100
         }),
         Timeline.createBandInfo({
+            overview: true,
+            timeZone: offset,
             eventSource: es,
-            date: (new Date()).toString(),
             width: '30%',
             intervalUnit: Timeline.DateTime.DAY,
             intervalPixels: 200
@@ -77,8 +79,8 @@ function setup_timeline() {
         function(data, url) { 
             data = $.map(data, function(n,i) {
                 return {
-                    start: n.created_at,
-                    end: n.updated_at,
+                    start: (new Date(n.created_at)).toString(),
+                    end: (new Date(n.updated_at)).toString(),
                     title: n.address
                 };
             });
