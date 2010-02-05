@@ -14,7 +14,7 @@ function insert_status (data) {
             function(arg){return '<a class="oembed" href="'+arg+'">'+arg+'</a>'}
         )
     );
-    text.find('a').oembed(null, { embedMethod: "append", maxWidth: 500 });
+    text.find('a').oembed(null,{ embedMethod: "append" });
     var username = $('<span/>').addClass('username').text(data.user.screen_name);
     var div = $('<div/>').addClass('status').append(username).append(text).append(when);
     $('#statuses').prepend(div);
