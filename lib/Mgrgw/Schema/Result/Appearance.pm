@@ -26,11 +26,6 @@ __PACKAGE__->add_columns(
         size => 15,
         is_nullable => 0,
     },
-    user_agent => {
-        data_type => 'VARCHAR',
-        size => 255,
-        is_nullable => 1,
-    },
     created_at => {
         data_type => 'DATETIME',
         set_on_create => 1,
@@ -52,7 +47,6 @@ sub format {
         updated_at => $self->updated_at->set_time_zone('UTC')->strftime("%a %b %d %T %z %Y"),
         id => $self->id,
         address => $self->address,
-        user_agent => $self->user_agent,
         user => { 
             id => $self->user->id,
             name => $self->user->fullname,

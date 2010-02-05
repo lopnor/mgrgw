@@ -1,12 +1,20 @@
 ? extends 'base';
-
+? block style => sub {
+    #timeline {
+        height: 150px;
+        width: 100%;
+        border: 2px #fcc800 solid;
+    }
+? };
 ? block js => sub {
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+<script src="http://static.simile.mit.edu/timeline/api-2.3.0/timeline-api.js?bundle=true"></script>
 <script src="<?= $c->uri_for('/js/jquery.oembed.js') ?>"></script>
 <script src="<?= $c->uri_for('/js/pretty.js') ?>"></script>
 <script type="text/javascript">
 
 var latest_id = 0;
+var tl;
 function insert_status (data) {
     var when = $('<span/>').addClass('timestamp')
         .attr('title', (new Date(data.created_at)).toString())
@@ -43,6 +51,41 @@ function appearance () {
         }
     );
 }
+function setup_timeline() {
+    var es = new Timeline.DefaultEventSource();
+    var bi = [
+        Timeline.createBandInfo({
+            eventSource: es,
+            date: (new Date()).toString(),
+            width: '70%',
+            intervalUnit: Timeline.DateTime.HOUR,
+            intervalPixels: 100
+        }),
+        Timeline.createBandInfo({
+            eventSource: es,
+            date: (new Date()).toString(),
+            width: '30%',
+            intervalUnit: Timeline.DateTime.DAY,
+            intervalPixels: 200
+        })
+    ];
+    bi[1].syncWith = 0;
+    bi[1].highlight = true;
+    tl = Timeline.create(document.getElementById('timeline'), bi);
+    Timeline.loadJSON(
+        "<?= $c->uri_for('/appearance.json') ?>", 
+        function(data, url) { 
+            data = $.map(data, function(n,i) {
+                return {
+                    start: n.created_at,
+                    end: n.updated_at,
+                    title: n.address
+                };
+            });
+            es.loadJSON({events: data}, url);
+        }
+    );
+}
 $(function() {
     appearance();
     $(':input[name=status]').attr('autocomplete', 'off').focus();
@@ -58,12 +101,14 @@ $(function() {
         );
         return false;
     });
+    setup_timeline();
     window.setInterval(function(){appearance()}, 1000 * 60 * 5);
 });
 </script>
 ? };
 
 ? block content => sub {
+<div id="timeline"></div>
 <form id="update_status" action="#">
 <input type="text" size="50" name="status" />
 <input type="submit" value="update" />

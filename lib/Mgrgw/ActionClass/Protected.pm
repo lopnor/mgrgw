@@ -28,7 +28,8 @@ around ACTION => sub {
         if ($user) {
             $c->req->env->{REMOTE_USER} = $user->username;
             $c->stash->{user} = $user;
-            models('Schema::Appearance')->record($user,$c->req);
+            $c->stash->{appearance} 
+                = models('Schema::Appearance')->record($user,$c->req);
         } else {
             $c->res->status(401);
             $c->res->header('WWW-Authenticate' => "Basic realm=\"$realm\"");

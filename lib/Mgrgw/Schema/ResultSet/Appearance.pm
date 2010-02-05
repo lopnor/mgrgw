@@ -16,7 +16,6 @@ sub record {
             {
                 user_id => $user->id,  
                 address => $req->address,
-                user_agent => $req->user_agent,
             }
         );
     }
@@ -28,7 +27,6 @@ sub current_appearance {
         {
             user_id => $user->id,
             address => $req->address,
-            user_agent => $req->user_agent,
             updated_at => { '>=' => DateTime->now->add(minutes => -10)->strftime("%F %T") },
         },
         {

@@ -28,8 +28,7 @@ sub index :API {
 sub current :API {
     my ($self, $c) = @_;
 
-    my $result = models('Schema::Appearance')->current_appearance($c->stash->{user}, $c->req);
-    $c->stash->{json} = $result ? $result->format : {};
+    $c->stash->{json} = $c->stash->{appearance}->format;
 }
 
 1;

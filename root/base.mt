@@ -71,6 +71,7 @@
             text-align: right;
             padding-right: 5px;
         }
+? block style => '';
     </style>
 ? block js => '';
 </head>
