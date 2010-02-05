@@ -58,7 +58,7 @@ function setup_timeline() {
         Timeline.createBandInfo({
             eventSource: es,
             timeZone: offset,
-            width: '70%',
+            width: '75%',
             intervalUnit: Timeline.DateTime.HOUR,
             intervalPixels: 100
         }),
@@ -66,9 +66,9 @@ function setup_timeline() {
             overview: true,
             timeZone: offset,
             eventSource: es,
-            width: '30%',
+            width: '25%',
             intervalUnit: Timeline.DateTime.DAY,
-            intervalPixels: 200
+            intervalPixels: 100
         })
     ];
     bi[1].syncWith = 0;
@@ -79,9 +79,10 @@ function setup_timeline() {
         function(data, url) { 
             data = $.map(data, function(n,i) {
                 return {
-                    start: (new Date(n.created_at)).toString(),
-                    end: (new Date(n.updated_at)).toString(),
-                    title: n.address
+                    start: n.created_at,
+                    end: n.updated_at,
+                    title: n.address,
+                    durationEvent: n.created_at != n.updated_at
                 };
             });
             es.loadJSON({events: data}, url);
