@@ -78,11 +78,12 @@ function setup_timeline() {
         "<?= $c->uri_for('/appearance.json') ?>", 
         function(data, url) { 
             data = $.map(data, function(n,i) {
+                var dur = (new Date(n.updated_at)) - (new Date(n.created_at));
                 return {
                     start: n.created_at,
                     end: n.updated_at,
                     title: n.address,
-                    durationEvent: n.created_at != n.updated_at
+                    durationEvent: dur > 10 * 60 * 1000
                 };
             });
             es.loadJSON({events: data}, url);
