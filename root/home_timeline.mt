@@ -2,13 +2,19 @@
 
 ? block js => sub {
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+<script src="<?= $c->uri_for('/js/jquery.oembed.js') ?>"></script>
 <script src="<?= $c->uri_for('/js/pretty.js') ?>"></script>
 <script type="text/javascript">
 function insert_status (data) {
     var when = $('<span/>').addClass('timestamp')
         .attr('title', (new Date(data.created_at)).toString())
         .text(data.created_at);
-    var text = $('<span/>').addClass('content').text(data.text);
+    var text = $('<span/>').addClass('content').html(
+        data.text.replace(/https?:\/\/\S+/g, 
+            function(arg){return '<a class="oembed" href="'+arg+'">'+arg+'</a>'}
+        )
+    );
+    text.find('a').oembed(null, { embedMethod: "append", maxWidth: 500 });
     var username = $('<span/>').addClass('username').text(data.user.screen_name);
     var div = $('<div/>').addClass('status').append(username).append(text).append(when);
     $('#statuses').prepend(div);
