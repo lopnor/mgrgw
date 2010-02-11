@@ -23,6 +23,11 @@ sub index :Path :Args(0) {
     }
 }
 
+sub username :Path :Args(1) {
+    my ($self, $c, $username) = @_;
+    $c->res->body($username);
+}
+
 sub home_timeline :Private {
     my ($self, $c) = @_;
     $c->forward($c->view('MT')->template('home_timeline'));

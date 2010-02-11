@@ -13,22 +13,77 @@
 <script src="<?= $c->uri_for('/js/pretty.js') ?>"></script>
 <script type="text/javascript">
 
-var latest_id = 0;
+var latest_id;
+var oldest_id;
 var tl;
+var es;
+function clean_statuses() {
+    latest_id = 0;
+    oldest_id = 0;
+    $('#statuses').html('');
+}
+function parse_text(text) {
+    text = text.replace(
+        /\b(https?:\/\/\S+)\b/g, 
+        '<a class="oembed" href="$1" target="_blank">$1</a>'
+    );
+    text = text.replace(
+        /(\W|^)@(\w+)(\W|$)/g,
+        '$1@<a href="<?= $c->uri_for('/') ?>$2" class="username">$2</a>$3'
+    );
+    text = text.replace(
+        /(\W|^)(#\w+)(\W|$)/g,
+        '$1<a href="<?= $c->uri_for('/') ?>search?q=$2" class="hashtag" title="$2">$2</a>$3'
+    );
+    return text;
+}
+function search(query) {
+    $.getJSON(
+        "<?= $c->uri_for('/search.json') ?>",
+        {q: query},
+        function (data) {
+            clean_statuses();
+            load_statuses(data);
+        }
+    );
+}
 function insert_status (data) {
+    if ($('#status_'+data.id).length != 0) return;
     var when = $('<span/>').addClass('timestamp')
         .attr('title', (new Date(data.created_at)).toString())
-        .text(data.created_at);
-    var text = $('<span/>').addClass('content').html(
-        data.text.replace(/https?:\/\/\S+/g, 
-            function(arg){return '<a class="oembed" href="'+arg+'">'+arg+'</a>'}
-        )
-    );
+        .prettyDate();
+    var text = $('<span/>').addClass('content').html(parse_text(data.text));
     text.find('a').oembed(null,{ embedMethod: "append" });
     var username = $('<span/>').addClass('username').text(data.user.screen_name);
-    var div = $('<div/>').addClass('status').append(username).append(text).append(when);
-    $('#statuses').prepend(div);
+    var div = $('<div/>').addClass('status')
+        .attr('id', 'status_'+data.id)
+        .append(username).append(text).append(when);
+    div.find('a.hashtag').click(function(){
+        search($(this).attr('title'));
+        return false;
+    });
+    var prev_stat_id;
+    var done = 0;
+    $('#statuses div.status').each(function(i,e){
+        var stat_id = parseInt($(e).attr('id').substr(7));
+        if ((prev_stat_id == undefined || prev_stat_id > data.id) && data.id > stat_id) {
+            div.insertBefore($(e));
+            done = 1;
+            return false;
+        }
+        prev_stat_id = stat_id;
+    });
+    if (done == 0) $('#statuses').append(div);
     $('.timestamp').prettyDate();
+}
+function load_statuses(data) {
+    var l = parseInt(data[0].id);
+    var o = parseInt(data[data.length-1].id);
+    if ( oldest_id == 0 || oldest_id > o) oldest_id = o;
+    if ( latest_id == 0 || latest_id < l) latest_id = l;
+    $.each(data, function(i, e) {
+        insert_status(e);
+    });
 }
 function appearance () {
     $.getJSON(
@@ -43,17 +98,31 @@ function appearance () {
     $.getJSON(
         "<?= $c->uri_for('/statuses/home_timeline.json') ?>",
         { since_id: latest_id },
-        function (statuses) {
-            latest_id = statuses[0].id;
-            $.each(statuses.reverse(), function(i, e) {
-                insert_status(e);
+        function (data) {load_statuses(data)}
+    );
+    load_timeline();
+}
+function load_timeline() {
+    Timeline.loadJSON(
+        "<?= $c->uri_for('/appearance.json') ?>", 
+        function(data, url) { 
+            data = $.map(data, function(n,i) {
+                var dur = (new Date(n.updated_at)) - (new Date(n.created_at));
+                return {
+                    start: n.created_at,
+                    end: n.updated_at,
+                    title: n.address,
+                    durationEvent: dur > 10 * 60 * 1000
+                };
             });
+            es.clear();
+            es.loadJSON({events: data}, url);
         }
     );
 }
 function setup_timeline() {
     var offset = (new Date()).getTimezoneOffset() / 60 * -1;
-    var es = new Timeline.DefaultEventSource();
+    es = new Timeline.DefaultEventSource();
     var bi = [
         Timeline.createBandInfo({
             eventSource: es,
@@ -74,25 +143,12 @@ function setup_timeline() {
     bi[1].syncWith = 0;
     bi[1].highlight = true;
     tl = Timeline.create(document.getElementById('timeline'), bi);
-    Timeline.loadJSON(
-        "<?= $c->uri_for('/appearance.json') ?>", 
-        function(data, url) { 
-            data = $.map(data, function(n,i) {
-                var dur = (new Date(n.updated_at)) - (new Date(n.created_at));
-                return {
-                    start: n.created_at,
-                    end: n.updated_at,
-                    title: n.address,
-                    durationEvent: dur > 10 * 60 * 1000
-                };
-            });
-            es.loadJSON({events: data}, url);
-        }
-    );
 }
 $(function() {
+    clean_statuses();
+    setup_timeline();
     appearance();
-    $(':input[name=status]').attr('autocomplete', 'off').focus();
+    $(':input[name=status]').focus();
     $('#update_status').submit(function() {
         $.post(
             "<?= $c->uri_for('/statuses/update.json') ?>",
@@ -105,8 +161,15 @@ $(function() {
         );
         return false;
     });
-    setup_timeline();
-    window.setInterval(function(){appearance()}, 1000 * 60 * 5);
+    $('#pager').click(function(){
+        $.getJSON(
+            "<?= $c->uri_for('/statuses/home_timeline.json') ?>",
+            { max_id: oldest_id },
+            function (data) {load_statuses(data)}
+        )
+        return false;
+    });
+    window.setInterval(function(){appearance()}, 1000 * 30);
 });
 </script>
 ? };
@@ -114,9 +177,10 @@ $(function() {
 ? block content => sub {
 <div id="timeline"></div>
 <form id="update_status" action="#">
-<input type="text" size="50" name="status" />
+<input type="text" size="50" name="status" autocomplete="off" />
 <input type="submit" value="update" />
 <span id="appearance"></span>
 </form>
 <div id="statuses"></div>
+<a href="#" id="pager">more</a>
 ? };

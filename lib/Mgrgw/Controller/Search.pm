@@ -1,4 +1,4 @@
-package Mgrgw::Controller::Statuses;
+package Mgrgw::Controller::Search;
 use Ark 'Controller';
 with 'Mgrgw::ActionClass::API',
     'Mgrgw::ActionClass::Protected';
@@ -9,34 +9,25 @@ sub auto :Private :Protected {
     1;
 }
 
-sub update :API {
-    my ($self, $c) = @_;
-    {
-        $c->req->method eq 'POST' or last;
-        my $status = models('Schema::Status')->create_from_req($c->req) or last;
-        $c->stash->{json} = $status->format;
-        return;
-    }
-    $c->res->status(403);
-    $c->res->body('forbidden');
-}
-
-sub replies :API {
-    my ($self, $c) = @_;
-    $c->stash->{json} = [];
-}
-
-sub home_timeline :API {
+sub index :API {
     my ($self, $c) = @_;
 
     my $since = $c->req->param('since_id');
     my $max = $c->req->param('max_id');
+    my $q = $c->req->param('q');
+
+    unless ($q) {
+        $c->res->status(403);
+        $c->res->body('forbidden');
+        $c->detach;
+    }
 
     my @statuses = map {
         $_->format
     } models('Schema::Status')->search(
         {
             user_id => $c->stash->{user}->id,
+            text => {like => "%$q%"},
             $since ? (id => {'>' => $since}) : (),
             $max ? (id => {'<=' => $max}) : (),
         },
