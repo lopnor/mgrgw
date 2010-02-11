@@ -169,7 +169,7 @@ $(function() {
         )
         return false;
     });
-    window.setInterval(function(){appearance()}, 1000 * 30);
+    window.setInterval(function(){appearance()}, 1000 * 60 * 5);
 });
 </script>
 ? };
