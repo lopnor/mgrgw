@@ -24,7 +24,7 @@ function clean_statuses() {
 }
 function parse_text(text) {
     text = text.replace(
-        /\b(https?:\/\/\S+)\b/g, 
+        /\b(https?:\/\/[\S\/]+)\b/g, 
         '<a class="oembed" href="$1" target="_blank">$1</a>'
     );
     text = text.replace(
