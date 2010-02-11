@@ -28,11 +28,11 @@ function parse_text(text) {
         '<a class="oembed" href="$1" target="_blank">$1</a>'
     );
     text = text.replace(
-        /(\W|^)@(\w+)(\W|$)/g,
+        /(\W|^)@(\w+)(\b|$)/g,
         '$1@<a href="<?= $c->uri_for('/') ?>$2" class="username">$2</a>$3'
     );
     text = text.replace(
-        /(\W|^)(#\w+)(\W|$)/g,
+        /(\W|^)(#\w+)(\b|$)/g,
         '$1<a href="<?= $c->uri_for('/') ?>search?q=$2" class="hashtag" title="$2">$2</a>$3'
     );
     return text;
