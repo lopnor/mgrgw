@@ -8,7 +8,7 @@
 ? };
 ? block js => sub {
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-<script src="http://static.simile.mit.edu/timeline/api-2.3.0/timeline-api.js?bundle=true"></script>
+<script src="<?= $c->uri_for('/js/timeline_2.3.0/timeline_js/timeline-api.js',{bundle => 'true'}) ?>"></script>
 <script src="<?= $c->uri_for('/js/jquery.oembed.js') ?>"></script>
 <script src="<?= $c->uri_for('/js/pretty.js') ?>"></script>
 <script type="text/javascript">
@@ -32,7 +32,7 @@ function parse_text(text) {
         '$1@<a href="<?= $c->uri_for('/') ?>$2" class="username">$2</a>'
     );
     text = text.replace(
-        /(\W|^)(#\w+)(?:\b|$)/g,
+        /(\s|^)(#\w+)(?:\b|$)/g,
         '$1<a href="<?= $c->uri_for('/') ?>search?q=$2" class="hashtag" title="$2">$2</a>'
     );
     return text;
