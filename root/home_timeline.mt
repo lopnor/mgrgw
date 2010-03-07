@@ -8,7 +8,12 @@
 ? };
 ? block js => sub {
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-<script src="<?= $c->uri_for('/js/timeline_2.3.0/timeline_js/timeline-api.js',{bundle => 'true'}) ?>"></script>
+<script type="text/javascript">
+Timeline_ajax_url="<?= $c->uri_for('/js/timeline_2.3.0/timeline_ajax/simile-ajax-api.js') ?>";
+Timeline_urlPrefix="<?= $c->uri_for('/js/timeline_2.3.0/timeline_js/') ?>";
+Timeline_parameters='bundle=true';
+</script>
+<script src="<?= $c->uri_for('/js/timeline_2.3.0/timeline_js/timeline-api.js') ?>"></script>
 <script src="<?= $c->uri_for('/js/jquery.oembed.js') ?>"></script>
 <script src="<?= $c->uri_for('/js/pretty.js') ?>"></script>
 <script type="text/javascript">
