@@ -139,6 +139,8 @@ sub create_access_token {
 sub protected_resource_request {
     my ($self, $req) = @_;
 
+    $req->param('oauth_token') or return;
+
     my $uri = $req->uri->clone;
     $uri->query_form([]);
 

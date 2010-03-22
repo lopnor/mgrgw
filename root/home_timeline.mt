@@ -116,10 +116,11 @@ function load_timeline() {
         function(data, url) { 
             data = $.map(data, function(n,i) {
                 var dur = (new Date(n.updated_at)) - (new Date(n.created_at));
+                var title = n.address.replace(/\/.+$/, '');
                 return {
                     start: n.created_at,
                     end: n.updated_at,
-                    title: n.address,
+                    title: title,
                     durationEvent: dur > 10 * 60 * 1000
                 };
             });
