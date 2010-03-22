@@ -43,7 +43,6 @@ __PACKAGE__->add_columns(
     created_at => {
         data_type => 'DATETIME',
         set_on_create => 1,
-        timezone => Mgrgw::Models->get('conf')->{time_zone},
     },
 );
 __PACKAGE__->set_primary_key('id');
@@ -52,7 +51,7 @@ __PACKAGE__->belongs_to(user => 'Mgrgw::Schema::Result::User' => 'user_id');
 sub format {
     my ($self) = @_;
     return {
-        created_at => $self->created_at->set_time_zone('UTC')->strftime("%a %b %d %T %z %Y"),
+        created_at => $self->created_at->strftime("%a %b %d %T %z %Y"),
         id => $self->id,
         text => $self->text,
         $self->in_reply_to_status_id ? 

@@ -30,13 +30,11 @@ __PACKAGE__->add_columns(
     created_at => {
         data_type => 'DATETIME',
         set_on_create => 1,
-        timezone => Mgrgw::Models->get('conf')->{time_zone},
     },
     updated_at => {
         data_type => 'DATETIME',
         set_on_create => 1,
         set_on_update => 1,
-        timezone => Mgrgw::Models->get('conf')->{time_zone},
     },
 );
 __PACKAGE__->set_primary_key('id');

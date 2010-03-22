@@ -136,7 +136,7 @@ function setup_timeline() {
         Timeline.createBandInfo({
             eventSource: es,
             timeZone: offset,
-            width: '70%',
+            width: '75%',
             intervalUnit: Timeline.DateTime.HOUR,
             intervalPixels: 100
         }),
@@ -144,7 +144,7 @@ function setup_timeline() {
             overview: true,
             timeZone: offset,
             eventSource: es,
-            width: '30%',
+            width: '25%',
             intervalUnit: Timeline.DateTime.DAY,
             intervalPixels: 100
         })

@@ -43,8 +43,8 @@ sub format {
     my ($self) = @_;
 
     return {
-        created_at => $self->created_at->set_time_zone('UTC')->strftime("%a %b %d %T %z %Y"),
-        updated_at => $self->updated_at->set_time_zone('UTC')->strftime("%a %b %d %T %z %Y"),
+        created_at => $self->created_at->strftime("%a %b %d %T %z %Y"),
+        updated_at => $self->updated_at->strftime("%a %b %d %T %z %Y"),
         id => $self->id,
         address => $self->address,
         user => { 
