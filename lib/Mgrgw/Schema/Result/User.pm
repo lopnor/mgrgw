@@ -54,5 +54,6 @@ __PACKAGE__->add_unique_constraint(['username']);
 __PACKAGE__->has_many(statuses => 'Mgrgw::Schema::Result::Status' => 'user_id');
 __PACKAGE__->has_many(applications => 'Mgrgw::Schema::Result::Application' => 'user_id');
 __PACKAGE__->has_many(openids => 'Mgrgw::Schema::Result::OpenID' => 'user_id');
+__PACKAGE__->has_many(tokens => 'Mgrgw::Schema::Result::Token' => 'user_id');
 
 1;

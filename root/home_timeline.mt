@@ -1,9 +1,12 @@
 ? extends 'base';
 ? block style => sub {
     #timeline {
-        height: 150px;
+        height: 160px;
         width: 100%;
         border: 2px #fcc800 solid;
+    }
+    #timeline * {
+        line-height: 1.5em;
     }
 ? };
 ? block js => sub {
@@ -132,7 +135,7 @@ function setup_timeline() {
         Timeline.createBandInfo({
             eventSource: es,
             timeZone: offset,
-            width: '75%',
+            width: '70%',
             intervalUnit: Timeline.DateTime.HOUR,
             intervalPixels: 100
         }),
@@ -140,7 +143,7 @@ function setup_timeline() {
             overview: true,
             timeZone: offset,
             eventSource: es,
-            width: '25%',
+            width: '30%',
             intervalUnit: Timeline.DateTime.DAY,
             intervalPixels: 100
         })

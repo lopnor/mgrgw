@@ -22,8 +22,8 @@ __PACKAGE__->add_columns(
         }
     },
     address => {
-        data_type => 'CHAR',
-        size => 15,
+        data_type => 'VARCHAR',
+        size => 255,
         is_nullable => 0,
     },
     created_at => {

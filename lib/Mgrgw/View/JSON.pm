@@ -18,4 +18,13 @@ has '+json_dumper' => (
     }
 );
 
+after process => sub {
+    my ($self, $c) = @_;
+    my $agent = $c->req->user_agent;
+    if ($agent =~ /Safari/ && $agent !~ m{WebKit/4}) {
+        (my $body = $c->res->body) =~ s/^\xEF\xBB\xBF//;
+        $c->res->body($body);
+    }
+};
+
 1;

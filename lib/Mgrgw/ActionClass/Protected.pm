@@ -9,27 +9,31 @@ around ACTION => sub {
 
     if (my $realm = $action->attributes->{Protected}->[0]) {
         my $c = $self->context;
-        my $user;
+        my ($user, $address);
         {
             if ($c->user && $c->user->obj) {
-                $user = $c->user->obj and last;
+                $user = $c->user->obj;
+                $address = $c->req->address;
+                last;
             }
             $user = $c->req->user and last;
             my $auth = $c->req->env->{HTTP_AUTHORIZATION};
             if (($auth || '') =~ /^Basic (.*)$/) {
                 $user = models('Schema::User')->basic_auth($auth);
+                $address = $c->req->user_agent;
             } else {
                 my $token = models('Schema::Token')->protected_resource_request($c->req)
                     or last;
                 $user = $token->user;
                 $c->stash->{application} = $token->application;
+                $address = $token->application->name;
             }
         }
         if ($user) {
             $c->req->env->{REMOTE_USER} = $user->username;
             $c->stash->{user} = $user;
             $c->stash->{appearance} 
-                = models('Schema::Appearance')->record($user,$c->req);
+                = models('Schema::Appearance')->record($user,$address);
         } else {
             $c->res->status(401);
             $c->res->header('WWW-Authenticate' => "Basic realm=\"$realm\"");

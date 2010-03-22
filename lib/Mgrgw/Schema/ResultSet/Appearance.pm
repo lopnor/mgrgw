@@ -6,27 +6,27 @@ use Mgrgw::Models;
 use DateTime;
 
 sub record {
-    my ($self, $user, $req) = @_;
+    my ($self, $user, $address) = @_;
 
-    my $found = $self->current_appearance($user, $req);
+    my $found = $self->current_appearance($user, $address);
     if ($found) {
         $found->update({updated_at => DateTime->now});
     } else {
         $self->create(
             {
                 user_id => $user->id,  
-                address => $req->address,
+                address => $address,
             }
         );
     }
 }
 
 sub current_appearance {
-    my ($self, $user, $req) = @_;
+    my ($self, $user, $address) = @_;
     $self->search(
         {
             user_id => $user->id,
-            address => $req->address,
+            address => $address,
             updated_at => { '>=' => DateTime->now->add(minutes => -10)->strftime("%F %T") },
         },
         {

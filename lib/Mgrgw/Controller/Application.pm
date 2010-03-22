@@ -23,7 +23,12 @@ sub item :Chained :PathPart('application') :CaptureArgs(1) {
             user_id => $c->user->obj->id,
             id => $id,
         }
-    )->single;
+    )->first;
+    unless ($c->stash->{app}) {
+        $c->res->status(403);
+        $c->res->body('forbidden');
+        $c->detach;
+    }
 }
 
 sub show :Chained('item') :PathPart('') :Args(0) {

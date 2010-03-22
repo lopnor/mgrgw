@@ -1,7 +1,7 @@
 package Mgrgw::Controller::OAuth;
 use Ark 'Controller';
 with 'Ark::ActionClass::Form',
-    'Mgrgw::ActionClass::BasicAuth';
+    'Mgrgw::ActionClass::LoginUser';
 
 use Mgrgw::Models;
 
@@ -61,6 +61,33 @@ sub unauthorized :Local {
     my ($self, $c) = @_;
     $c->res->status(401);
     $c->res->body('Unauthorized');
+}
+
+sub index :Path :LoginUser {}
+
+sub load_token :LoginUser :Chained :PathPart('oauth') :CaptureArgs(1) {
+    my ($self, $c, $id) = @_;
+    $c->stash->{token} = models('Schema::Token')->search(
+        {
+            user_id => $c->user->obj->id,
+            id => $id,
+            type => 'access token',
+        }
+    )->first;
+    unless ($c->stash->{token}) {
+        $c->res->status(403);
+        $c->res->body('forbidden');
+        $c->detach;
+    }
+}
+
+sub revoke :Chained('load_token') :PathPart('') :Args(0) :Form('Mgrgw::Form::Token::Revoke') {
+    my ($self, $c) = @_;
+    if ($c->req->method eq 'POST' && $self->form->submitted_and_valid) {
+        $c->stash->{token}->delete;
+        $c->redirect($c->uri_for('/oauth'));
+    }
+    $self->form->fill({token => $c->stash->{token}->token});
 }
 
 1;
