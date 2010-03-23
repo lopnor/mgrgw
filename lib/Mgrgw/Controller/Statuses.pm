@@ -37,12 +37,13 @@ sub home_timeline :API {
     } models('Schema::Status')->search(
         {
             user_id => $c->stash->{user}->id,
-            $since ? (id => {'>' => $since}) : (),
-            $max ? (id => {'<=' => $max}) : (),
+            $since ? ('me.id' => {'>' => $since}) : (),
+            $max ? ('me.id' => {'<=' => $max}) : (),
         },
         {
-            order_by => { -desc => 'id' },
+            order_by => { -desc => 'me.id' },
             rows => $c->req->param('count') || 20,
+            prefetch => 'user',
         }
     );
 
