@@ -8,17 +8,21 @@ use DateTime;
 sub record {
     my ($self, $user, $address) = @_;
 
+    my $txn_guard = $self->result_source->schema->txn_scope_guard;
+
     my $found = $self->current_appearance($user, $address);
     if ($found) {
         $found->update({updated_at => DateTime->now});
     } else {
-        $self->create(
+        $found = $self->create(
             {
                 user_id => $user->id,  
                 address => $address,
             }
         );
     }
+    $txn_guard->commit;
+    $found;
 }
 
 sub current_appearance {
