@@ -3,6 +3,18 @@ name 'Mgrgw';
 all_from 'lib/Mgrgw.pm';
 
 requires 'Ark';
+requires 'DBIx::Class::TimeStamp';
+requires 'DBIx::Class::EncodedColumn';
+requires 'DateTime';
+requires 'Data::Rmap';
+requires 'Digest::SHA1';
+requires 'Text::MicroTemplate';
+requires 'Plack::Middleware::ReverseProxy';
+requires 'Net::OAuth';
+requires 'Cache::FastMmap';
+requires 'JSON::Any';
+requires 'JSON::XS';
+requires 'XML::Simple';
 
 tests 't/*.t';
 

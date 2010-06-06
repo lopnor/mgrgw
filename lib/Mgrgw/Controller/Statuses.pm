@@ -43,7 +43,7 @@ sub home_timeline :API {
         {
             order_by => { -desc => 'me.id' },
             rows => $c->req->param('count') || 20,
-            join => 'user',
+            prefetch => 'user',
         }
     );
 
