@@ -18,7 +18,7 @@ sub index :API {
             user_id => $c->stash->{user}->id,
         },
         {
-            order_by => { -desc => 'updated_at' },
+            order_by => { -desc => [qw(updated_at id)] },
             group_by => [qw(created_at address)],
             rows => $c->req->param('count') || 20,
         }
