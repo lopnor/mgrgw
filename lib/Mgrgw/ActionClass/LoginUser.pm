@@ -3,10 +3,10 @@ use Any::Moose '::Role';
 use Mgrgw::Models;
 
 around ACTION => sub {
-    my ($next, $self, $action, @args) = @_;
+    my ($next, $self, $action, $c, @args) = @_;
 
     if ($action->attributes->{LoginUser}->[0]) {
-        my $c = $self->context;
+#        my $c = $self->context;
         
         my $user = $c->user;
         unless ($user) {
@@ -21,7 +21,7 @@ around ACTION => sub {
         }
     }
 
-    $next->($self, $action, @args);
+    $next->($self, $action, $c, @args);
 };
 
 sub _parse_LoginUser_attr {

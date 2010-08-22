@@ -23,7 +23,7 @@ sub create_request_token {
     $uri->query_form([]);
 
     my $oauth = Net::OAuth->request($type)->from_hash(
-        $req->params,
+        $req->parameters->as_hashref,
         request_method => $req->method,
         request_url => $uri,
         consumer_secret => $app->consumer_secret,
@@ -103,7 +103,7 @@ sub create_access_token {
     $app->consumer_key eq $req->param('oauth_consumer_key') or return;
 
     my $oauth = Net::OAuth->request($type)->from_hash(
-        $req->params,
+        $req->parameters->as_hashref,
         request_method => $req->method,
         request_url => $uri,
         token_secret => $req_token->secret,
@@ -138,28 +138,51 @@ sub create_access_token {
 
 sub protected_resource_request {
     my ($self, $req) = @_;
-
-    $req->param('oauth_token') or return;
-
     my $uri = $req->uri->clone;
     $uri->query_form([]);
 
+
+    my $hash = do {
+        if (my $header = $req->header('authorization')) {
+            my $hash = { split(/[=,]/, [split(/\s/, $header)]->[1]) };
+            $hash->{$_} =~ s{^"|"$}{}g for keys %$hash;
+            $hash;
+        } else {
+            $req->parameters->as_hashref;
+        }
+    };
+
     my $token = $self->search( 
         { 
-            token => $req->param('oauth_token'),
+            token => $hash->{oauth_token},
             type => 'access token',
         }
     )->single or return;
     my $app = $token->application;
-    $app->consumer_key eq $req->param('oauth_consumer_key') or return;
-    my $params = $req->body_parameters;
-    my $oauth = Net::OAuth->request('protected resource')->from_hash(
-        $req->params,
+    $app->consumer_key eq $hash->{oauth_consumer_key} or return;
+
+    my $params = {
         request_method => $req->method,
         request_url => $uri,
         token_secret => $token->secret,
         consumer_secret => $app->consumer_secret,
-    );
+    };
+    my $oauth = do {
+        if (my $header = $req->header('authorization')) {
+            Net::OAuth->request('protected resource')->from_authorization_header(
+                $req->header('authorization'),
+                %$params,
+                extra_params => $req->parameters->as_hashref,
+            );
+        } else {
+            Net::OAuth->request('protected resource')->from_hash(
+                $hash,
+                %$params,
+            );
+        }
+    };
+    use Data::Dumper;
+    warn Dumper $oauth;
     $oauth->verify or return;
     return $token;
 }

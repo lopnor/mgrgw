@@ -5,10 +5,10 @@ use Mgrgw::Models;
 use DateTime;
 
 around ACTION => sub {
-    my ($next, $self, $action, @args) = @_;
+    my ($next, $self, $action, $c, @args) = @_;
 
     if (my $realm = $action->attributes->{Protected}->[0]) {
-        my $c = $self->context;
+#        my $c = $self->context;
         my ($user, $address);
         {
             if ($c->user && $c->user->obj) {
@@ -42,7 +42,7 @@ around ACTION => sub {
         }
     }
 
-    $next->($self, $action, @args);
+    $next->($self, $action, $c, @args);
 };
 
 no Any::Moose '::Role';

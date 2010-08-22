@@ -3,10 +3,10 @@ use Any::Moose '::Role';
 use Mgrgw::Models;
 
 around ACTION => sub {
-    my ($next, $self, $action, @args) = @_;
+    my ($next, $self, $action, $c, @args) = @_;
 
     if (my $realm = $action->attributes->{BasicAuth}->[0]) {
-        my $c = $self->context;
+#        my $c = $self->context;
 
         {
             $c->req->user and last;
@@ -23,7 +23,7 @@ around ACTION => sub {
         }
     }
 
-    $next->($self, $action, @args);
+    $next->($self, $action, $c, @args);
 };
 
 no Any::Moose '::Role';

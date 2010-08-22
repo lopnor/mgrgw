@@ -15,10 +15,10 @@ sub _parse_API_attr {
 }
 
 around ACTION => sub {
-    my ($next, $self, $action, @args) = @_;
-    $next->($self, $action, @args);
+    my ($next, $self, $action, $c, @args) = @_;
+    $next->($self, $action, $c, @args);
     if (($action->attributes->{Regex}->[0] || '') =~ m{\(\?\#api\)$}) {
-        my $c = $self->context;
+#        my $c = $self->context;
         unless ($c->res->body || $c->res->status =~ m{^3\d{2}$}) {
             my $type = [ split(/\./, $c->req->path) ]->[1] || 'XML';
             $c->forward($c->view(uc $type));

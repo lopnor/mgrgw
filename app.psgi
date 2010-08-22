@@ -1,4 +1,5 @@
 #!perl
+use lib 'lib';
 use Plack::Builder;
 use Plack::Middleware::Static;
 use Plack::Middleware::ReverseProxy;
