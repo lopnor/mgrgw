@@ -12,18 +12,26 @@ sub auto :Private :Protected {
 sub index :API {
     my ($self, $c) = @_;
 
-    my @result = map {$_->format}
-    models('Schema::Appearance')->search(
+    my @result = models('Schema::Appearance')->search(
         {
             user_id => $c->stash->{user}->id,
         },
         {
             order_by => { -desc => [qw(updated_at id)] },
-            group_by => [qw(created_at address)],
             rows => $c->req->param('count') || 20,
         }
     );
-    $c->stash->{json} = \@result;
+    my $hash;
+    for (@result) {
+        if (my $old = $hash->{$_->created_at}) {
+            if ($_->updated_at > $old->updated_at) {
+                $hash->{$_->created_at} = $_;
+            }
+        } else {
+            $hash->{$_->created_at} = $_;
+        }
+    }
+    $c->stash->{json} = [map {$hash->{$_}->format} sort {$b cmp $a} keys %$hash];
 }
 
 sub current :API {
