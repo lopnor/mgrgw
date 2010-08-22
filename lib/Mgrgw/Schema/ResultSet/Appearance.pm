@@ -19,7 +19,7 @@ sub record {
             updated_at => { '>=' => $time->strftime("%F %T") },
         },
         {
-            order_by => {-desc => qw(updated_at id)}
+            order_by => {-desc => [qw(updated_at id)]}
         }
     )->first;
 
