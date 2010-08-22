@@ -19,6 +19,7 @@ sub index :API {
         },
         {
             order_by => { -desc => 'updated_at' },
+            group_by => [qw(created_at address)],
             rows => $c->req->param('count') || 20,
         }
     );
