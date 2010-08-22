@@ -31,7 +31,7 @@ sub index :API {
             $hash->{$_->created_at} = $_;
         }
     }
-    $c->stash->{json} = [map {$hash->{$_}->format} sort {$b cmp $a} keys %$hash];
+    $c->stash->{json} = [map {$hash->{$_}->format} sort {$b <=> $a} keys %$hash];
 }
 
 sub current :API {
