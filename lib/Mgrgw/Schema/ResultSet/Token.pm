@@ -90,38 +90,61 @@ sub create_access_token {
     $uri->query_form([]);
 
     my $txn_guard = $self->result_source->schema->txn_scope_guard;
+    my $hash = $self->oauth_request_hash($req);
 
-    my $req_token = $self->search(
-        {
-            token => $req->param('oauth_token'),
-            verifier => $req->param('oauth_verifier'),
-            type => 'request token',
-        }
-    )->single or return;
-    
-    my $app = $req_token->application or return;
-    $app->consumer_key eq $req->param('oauth_consumer_key') or return;
+    my ($app, $user_id);
+    if (($hash->{x_auth_mode} || '') eq 'client_auth') {
+        $app = models('Schema::Application')->search(
+            { consumer_key => $hash->{oauth_consumer_key} }
+        )->single 
+            or return;
+        my $user = models('Schema::User')->find(
+            { username => ($hash->{x_auth_username}||'') }
+        ) 
+            or return;
+        $user_id = $user->id;
+        $user->check_password(($hash->{x_auth_password}||'') )
+            or return;
+        my $oauth = Net::OAuth->request('XauthAccessToken')->from_authorization_header(
+            $req->header('authorization'),
+            request_url => $uri,
+            request_method => $req->method,
+            consumer_secret => $app->consumer_secret,
+        );
+        $oauth->verify or return;
+    } else {
+        my $req_token = $self->search(
+            {
+                token => $hash->{oauth_token},
+                verifier => $hash->{oauth_verifier},
+                type => 'request token',
+            }
+        )->single or return;
 
-    my $oauth = Net::OAuth->request($type)->from_hash(
-        $req->parameters->as_hashref,
-        request_method => $req->method,
-        request_url => $uri,
-        token_secret => $req_token->secret,
-        consumer_secret => $app->consumer_secret,
-    );
-    $oauth->verify or return;
+        $app = $req_token->application or return;
+        $user_id = $req_token->user_id;
+        $app->consumer_key eq $hash->{oauth_consumer_key} or return;
+
+        my $oauth = Net::OAuth->request($type)->from_hash(
+            $req->parameters->as_hashref,
+            request_method => $req->method,
+            request_url => $uri,
+            token_secret => $req_token->secret,
+            consumer_secret => $app->consumer_secret,
+        );
+        $oauth->verify or return;
+        $req_token->delete;
+    }
 
     my $token = $self->create(
         {
             application_id => $app->id,
-            user_id => $req_token->user_id,
+            user_id => $user_id,
             token => $self->sha1_hex,
             secret => $self->sha1_hex,
             type => $type,
         }
     );
-
-    $req_token->delete;
 
     my $res = Net::OAuth->response($type)->new(
         token => $token->token,
@@ -141,16 +164,7 @@ sub protected_resource_request {
     my $uri = $req->uri->clone;
     $uri->query_form([]);
 
-
-    my $hash = do {
-        if (my $header = $req->header('authorization')) {
-            my $hash = { split(/[=,]/, [split(/\s/, $header)]->[1]) };
-            $hash->{$_} =~ s{^"|"$}{}g for keys %$hash;
-            $hash;
-        } else {
-            $req->parameters->as_hashref;
-        }
-    };
+    my $hash = $self->oauth_request_hash($req);
 
     my $token = $self->search( 
         { 
@@ -181,10 +195,19 @@ sub protected_resource_request {
             );
         }
     };
-    use Data::Dumper;
-    warn Dumper $oauth;
     $oauth->verify or return;
     return $token;
+}
+
+sub oauth_request_hash {
+    my ($self, $req) = @_;
+    if (my $header = $req->header('authorization')) {
+        my $hash = { split(/[=,]/, [split(/\s/, $header)]->[1]) };
+        $hash->{$_} =~ s{^"|"$}{}g for keys %$hash;
+        return $hash;
+    } else {
+        return $req->parameters->as_hashref;
+    }
 }
 
 1;

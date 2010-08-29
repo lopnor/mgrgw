@@ -1,4 +1,5 @@
 ? extends 'base';
 ? block content => sub {
-PIN is <b><?= $s->{verifier} ?></b>.
+You verified <?= $s->{token}->application->name ?>.</br>
+PIN is <b><?= $s->{token}->verifier ?></b>.
 ? };

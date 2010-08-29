@@ -5,7 +5,7 @@
 <form method="POST">
 ? }
 <table>
-? for my $field (keys %{$form->fields}) {
+? for my $field (@{$form->_fields_data_order}) {
 ?   if ($form->fields->{$field}->{type} eq 'hidden') {
         <?= raw_string $form->input($field) ?>
 ?   } else {

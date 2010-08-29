@@ -54,3 +54,5 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['consumer_key']);
 __PACKAGE__->belongs_to('user', 'Mgrgw::Schema::Result::User', 'user_id');
+
+1;

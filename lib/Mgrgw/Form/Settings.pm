@@ -10,7 +10,7 @@ param 'fullname' => (
 );
 
 param 'password' => (
-    label => 'Password (for BasicAuth APIs)',
+    label => 'Password (for BasicAuth/xAuth clients)',
     type => 'password',
 );
 

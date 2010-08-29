@@ -35,11 +35,19 @@ sub show :Chained('item') :PathPart('') :Args(0) {
 
 }
 
-sub edit :Chained('item') :PathPart('edit') :Args(0) {
+sub edit :Chained('item') :PathPart('edit') :Form('Mgrgw::Form::Application::Edit') :Args(0) {
+    my ($self, $c) = @_;
+    my $form = $self->form;
+    my $app = $c->stash->{app};
 
+    if ($c->req->method eq 'POST' and $form->submitted_and_valid) {
+        models('Schema::Application')->update_by_form($app, $form);
+        $c->redirect( $c->uri_for('application', $app->id) );
+    }
+    $form->fill({$app->get_columns});
 }
 
-sub create :Local :Form('Mgrgw::Form::Newapp') {
+sub create :Local :Form('Mgrgw::Form::Application::Create') {
     my ($self, $c) = @_;
 
     if ($c->req->method eq 'POST' and $self->form->submitted_and_valid) {

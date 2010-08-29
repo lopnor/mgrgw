@@ -37,4 +37,30 @@ sub record {
     $found;
 }
 
+sub recent {
+    my ($self, $user, $params) = @_;
+
+    my @result = models('Schema::Appearance')->search(
+        {
+            user_id => $user->id,
+        },
+        {
+            order_by => { -desc => [qw(updated_at id)] },
+            rows => $params->{count} || 20,
+        }
+    );
+    my $hash;
+    for (@result) {
+        my $epoch = $_->created_at->epoch;
+        if (my $old = $hash->{$epoch}) {
+            if ($_->updated_at > $old->updated_at) {
+                $hash->{$epoch} = $_;
+            }
+        } else {
+            $hash->{$epoch} = $_;
+        }
+    }
+    return [map {$hash->{$_}->format} reverse sort keys %$hash];
+}
+
 1;

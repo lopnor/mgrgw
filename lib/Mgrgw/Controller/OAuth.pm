@@ -16,10 +16,11 @@ sub request_token :Local {
 sub authorize :Local :LoginUser :Form('Mgrgw::Form::Authorize') {
     my ($self, $c) = @_;
     my $token = models('Schema::Token')->token_to_authorize($c->req)
-        or $c->detach('default');
+        or $c->detach('/default');
     if ($c->req->method eq 'POST' && $self->form->submitted_and_valid) {
         $c->detach('authorized', $token);
     }
+    $c->stash->{token} = $token;
     $self->form->fill($c->req);
 }
 
@@ -36,7 +37,7 @@ sub authorized :Private {
     } else {
         $c->stash(
             {
-                verifier => $token->verifier,
+                token => $token,
                 __view_mt_template => 'oauth/authorized',
             }
         );

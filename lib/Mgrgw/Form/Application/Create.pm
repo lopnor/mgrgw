@@ -1,4 +1,4 @@
-package Mgrgw::Form::Newapp;
+package Mgrgw::Form::Application::Create;
 use Ark 'Form';
 
 param 'name' => (
