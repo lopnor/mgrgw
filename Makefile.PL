@@ -16,6 +16,14 @@ requires 'JSON::Any';
 requires 'JSON::XS';
 requires 'XML::Simple';
 
+# for mgrgw-im
+requires 'AnyEvent::XMPP';
+requires 'Config::Pit';
+requires 'Net::Twitter';
+requires 'DBI';
+requires 'DBD::SQLite';
+requires 'Net::SSLeay';
+
 tests 't/*.t';
 
 build_requires 'Test::More';

@@ -11,7 +11,7 @@ register Schema => sub {
     Mgrgw::Schema->connect(@$conf);
 };
 
-for my $table (qw(User Status Application Token OpenID Appearance)) {
+for my $table (qw(User Status Application Token OpenID Appearance Webhook)) {
     register "Schema::$table" => sub {
         my $self = shift;
         $self->get('Schema')->resultset($table);
@@ -26,5 +26,14 @@ register cache => sub {
     $self->ensure_class_loaded('Cache::FastMmap');
     Cache::FastMmap->new(%$conf);
 };
+
+#register schwartz => sub {
+#    my $self = shift;
+#    my $conf = $self->get('conf')->{the_schwartz}
+#        or die 'requires the_schwartz config';
+#    my $class = TheSchwartz::Simple;
+#    $self->ensure_class_loaded($class);
+#    $class->new();
+#}
 
 1;

@@ -154,6 +154,10 @@ function setup_timeline() {
     tl = Timeline.create(document.getElementById('timeline'), bi);
 }
 $(function() {
+    $.fn.oembed.registerProvider(
+        'nicovideo', 'www.nicovideo.jp', 'http://oembed.soffritto.org/oembed');
+    $.fn.oembed.registerProvider(
+        'pixiv', 'www.pixiv.net', 'http://oembed.soffritto.org/oembed');
     clean_statuses();
     setup_timeline();
     appearance();
