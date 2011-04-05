@@ -158,6 +158,8 @@ $(function() {
         'nicovideo', 'www.nicovideo.jp', 'http://oembed.soffritto.org/oembed');
     $.fn.oembed.registerProvider(
         'pixiv', 'www.pixiv.net', 'http://oembed.soffritto.org/oembed');
+    $.fn.oembed.registerProvider(
+        'twitter', 'twitter.com');
     clean_statuses();
     setup_timeline();
     appearance();
